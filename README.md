@@ -26,7 +26,7 @@ O projeto foi desenvolvido para a disciplina GRULFAT, atendendo aos critérios d
 ## Estrutura do Projeto
 
 ```
-project2-GRULFAT/
+text-scratch-parser/
 │
 ├── exemplos_scratch/           # Arquivos de código-fonte em linguagem textual (.scratch)
 │   ├── exemplo1.scratch
@@ -41,7 +41,7 @@ project2-GRULFAT/
 │
 ├── lexer.py                    # Analisador léxico (tokenizador)
 ├── sintatico.py                # Analisador sintático (parser) com gramática
-├── interprete.py               # Interpretador que executa comandos da AST
+├── interprete.py               # Interpretador que executa comandos da AST e gera logs detalhados com indentação hierárquica para estruturas de controle (condicionais e repetições)
 ├── main.py                     # Script principal para executar um programa .scratch
 ├── rodar_testes.py             # Script para executar automaticamente todos os exemplos
 └── README.md                   # Documentação do projeto (este arquivo)
@@ -145,8 +145,170 @@ fim
 
 ## Logs e Exportação JSON
 
-- **Logs**: Arquivos gerados na pasta `testes-logs/` detalham cada comando executado, incluindo o estado do ator (posição, direção, etc.) em cada passo.
-- **JSON**: Arquivos na pasta `testes-json/` contêm o estado final do ator (posição, cor, direção) e o log completo da execução, permitindo integração com outras ferramentas ou análises posteriores.
+### Logs
+Os arquivos de log são gerados na pasta `testes-logs/` e detalham cada comando executado durante a interpretação de um programa. A indentação reflete a hierarquia dos blocos de controle, como `se` e `repita`, facilitando a leitura e a depuração. Cada entrada no log inclui:
+
+- O timestamp da execução.
+- O tipo de ação (execucao, saida, controle, condicao, movimento, tempo, etc.).
+- A mensagem descrevendo o comando ou ação realizada.
+- O nível de indentação para refletir a hierarquia.
+
+### Exemplo de Log com Indentação
+```
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'diga'
+[2025-07-03T00:08:14.372400] [saida]      Diz: "Vamos testar condições..."
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'se'
+[2025-07-03T00:08:14.372400] [controle]   Avaliando condição 'se'
+[2025-07-03T00:08:14.372400] [condicao]   Condição pressionando_tecla 'seta_cima' → False (simulado)
+[2025-07-03T00:08:14.372400] [controle]   Condição falsa — bloco 'se' ignorado
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'se'
+[2025-07-03T00:08:14.372400] [controle]   Avaliando condição 'se'
+[2025-07-03T00:08:14.372400] [condicao]   Condição tocando_cor 'preto' → True
+[2025-07-03T00:08:14.372400] [execucao]     Executando comando 'diga'
+[2025-07-03T00:08:14.372400] [saida]        Diz: "Estou na cor preta!"
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'mude_cor'
+[2025-07-03T00:08:14.372400] [movimento]  Mudando cor para rosa
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'vire_esquerda'
+[2025-07-03T00:08:14.372400] [movimento]  Virando à esquerda 45 graus → direção agora: 315
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'espere'
+[2025-07-03T00:08:14.372400] [tempo]      Esperando 1 segundo(s)
+[2025-07-03T00:08:14.372400] [execucao]   Executando comando 'diga'
+[2025-07-03T00:08:14.372400] [saida]      Diz: "Pronto!"
+```
+
+---
+
+### JSON
+Os arquivos JSON são gerados na pasta `testes-json/` e contêm duas seções principais:
+- **estado_final**: O estado final do ator após a execução do programa, incluindo posição, cor e direção.
+- **log**: O log completo da execução, detalhando cada comando ou ação executada, com timestamp, tipo, mensagem e nível de indentação.
+
+### Exemplo de Estrutura JSON
+```json
+{
+    "estado_final": {
+        "posicao": 0,
+        "direcao": 315,
+        "cor": "rosa"
+    },
+    "log": [
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'diga'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "saida",
+            "mensagem": "Diz: \"Vamos testar condições...\"",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'se'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "controle",
+            "mensagem": "Avaliando condição 'se'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "condicao",
+            "mensagem": "Condição pressionando_tecla 'seta_cima' → False (simulado)",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "controle",
+            "mensagem": "Condição falsa — bloco 'se' ignorado",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'se'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "controle",
+            "mensagem": "Avaliando condição 'se'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "condicao",
+            "mensagem": "Condição tocando_cor 'preto' → True",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'diga'",
+            "nivel_indent": 1
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "saida",
+            "mensagem": "Diz: \"Estou na cor preta!\"",
+            "nivel_indent": 1
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'mude_cor'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "movimento",
+            "mensagem": "Mudando cor para rosa",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'vire_esquerda'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "movimento",
+            "mensagem": "Virando à esquerda 45 graus → direção agora: 315",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'espere'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "tempo",
+            "mensagem": "Esperando 1 segundo(s)",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "execucao",
+            "mensagem": "Executando comando 'diga'",
+            "nivel_indent": 0
+        },
+        {
+            "timestamp": "2025-07-03T00:08:14.372400",
+            "tipo": "saida",
+            "mensagem": "Diz: \"Pronto!\"",
+            "nivel_indent": 0
+        }
+    ]
+}
+```
 
 ---
 
@@ -181,8 +343,31 @@ O sistema processa o código `.scratch` em etapas:
 
 ---
 
+## Como Clonar e Rodar o Projeto Localmente
+
+```bash
+git clone https://github.com/diogoalmeida34/text-scratch-parser.git
+
+cd <nome-repositorio>
+
+#Python 3.8 ou superior já instalado
+python --version
+
+# Instale as dependências necessárias:
+pip install ply
+
+# Este comando executa um único programa .scratch
+python main.py exemplos_scratch/exemplo1.scratch
+
+#OU
+
+# Este comando executa automaticamente todos os arquivos .scratch encontrados na pasta exemplos_scratch/
+python rodar_testes.py
+```
+---
+
 ## Referências
 
 - Scratch: https://scratch.mit.edu  
 - PLY (Python Lex-Yacc): https://www.dabeaz.com/ply/  
-- Documentação Python: https://docs.python.org/3/  
+- Documentação Python: https://docs.python.org/3/
