@@ -1,0 +1,13 @@
+quando bandeira clicada
+    mova 100 passos
+    se tocando_borda entao
+        diga "Cheguei na borda!"
+        mude_cor_para "amarelo"
+    fim
+    repita 4 vezes
+        diga "Estou girando!"
+        vire direita 90 graus
+        espere 1 segundo
+    fim
+    diga "Finalizei o giro!"
+fim

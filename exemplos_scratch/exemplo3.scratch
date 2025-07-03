@@ -1,0 +1,9 @@
+quando bandeira clicada
+    mova 5 passos
+    vire direita 45 graus
+    se pressionando_tecla "espaço" entao
+        diga "Tecla espaço foi pressionada!"
+        mude_cor_para "verde"
+    fim
+    diga "Programa concluído!"
+fim

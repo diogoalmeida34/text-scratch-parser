@@ -1,0 +1,12 @@
+quando bandeira clicada
+    mova 20 passos
+    vire esquerda 90 graus
+    se tocando_cor "vermelho" entao
+        diga "Achei a cor vermelha!"
+    fim
+    mude_cor_para "azul"
+    repita 2 vezes
+        diga "Azul está bonito!"
+        espere 2 segundo
+    fim
+fim

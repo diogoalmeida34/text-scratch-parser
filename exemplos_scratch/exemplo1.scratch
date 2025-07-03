@@ -1,0 +1,12 @@
+quando bandeira clicada
+    mova 10 passos
+    vire direita 15 graus
+    se tocando_borda entao
+        diga "Estou na borda"
+    fim
+    repita 3 vezes
+        diga "Oi!"
+        espere 1 segundo
+    fim
+    mude_cor_para "vermelho"
+fim

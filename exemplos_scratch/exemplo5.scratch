@@ -1,0 +1,13 @@
+quando bandeira clicada
+    diga "Vamos testar condições..."
+    se pressionando_tecla "seta_cima" entao
+        diga "Você apertou seta para cima!"
+    fim
+    se tocando_cor "preto" entao
+        diga "Estou na cor preta!"
+    fim
+    mude_cor_para "rosa"
+    vire esquerda 45 graus
+    espere 1 segundo
+    diga "Pronto!"
+fim
