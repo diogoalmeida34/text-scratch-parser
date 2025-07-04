@@ -85,5 +85,7 @@ def p_error(p):
         print(f"Erro sintático na linha {p.lineno}: token inesperado '{p.value}'")
     else:
         print("Erro sintático: fim inesperado do arquivo")
+    # Retorna None para indicar erro
+    raise SyntaxError("Erro sintático detectado")
 
 parser = yacc.yacc()

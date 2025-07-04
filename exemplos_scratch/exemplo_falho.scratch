@@ -1,0 +1,17 @@
+// Comentário de linha única — estilo C/C++
+# Comentário de linha única — estilo Python
+
+/* Comentário multilinha
+   Esse bloco é completamente ignorado pelo lexer
+   Pode conter várias linhas e serve para anotações longas
+*/
+
+quando bandeira clicada
+    mova 10 passos
+    se tocando_borda entao
+        diga "Estou na borda"
+    # Erro: falta o 'fim' para fechar o bloco 'se'
+    repita 3 vezes
+        diga "Oi!"
+    fim
+fim

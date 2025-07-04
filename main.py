@@ -13,11 +13,15 @@ def executar_codigo(caminho_arquivo):
     print(f"Código lido:\n{codigo}")
     print("\nIniciando parser...")
 
-    resultado = parser.parse(codigo)
+    try:
+        resultado = parser.parse(codigo)
+    except SyntaxError as e:
+        print(f"Erro sintático detectado: {e}")
+        return None, EstadoAtor(), ["Erro sintático detectado"]
 
     if not resultado or len(resultado) < 2:
         print("Nenhum comando reconhecido.\n")
-        return [], EstadoAtor(), ["Nenhum comando reconhecido."]
+        return None, EstadoAtor(), ["Nenhum comando reconhecido."]
 
     comandos = resultado[1]
 
@@ -71,9 +75,14 @@ if __name__ == '__main__':
 
     try:
         comandos_parseados, estado_final, log = executar_codigo(arquivo)
-        for registro in log:
-            print(f"[{registro['timestamp']}] [{registro['tipo']}] {registro['mensagem']}")
-        sucesso = 1
+
+        if comandos_parseados is None:
+            # Parser falhou, já avisamos no executar_codigo
+            falhas = 1
+        else:
+            for registro in log:
+                print(f"[{registro['timestamp']}] [{registro['tipo']}] {registro['mensagem']}")
+            sucesso = 1
     except FileNotFoundError:
         print(f"Arquivo '{arquivo}' não encontrado.")
         falhas = 1

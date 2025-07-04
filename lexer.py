@@ -49,6 +49,22 @@ def t_STRING(t):
     t.value = t.value[1:-1]  # Remove aspas
     return t
 
+# Comentário de linha única: # comentário
+def t_COMMENT_HASH(t):
+    r'\#.*'
+    pass  # Ignora comentário
+
+# Comentário de linha única: // comentário
+def t_COMMENT_SLASH(t):
+    r'//.*'
+    pass  # Ignora comentário
+
+# Comentário multilinha: /* comentário */
+def t_COMMENT_MULTILINE(t):
+    r'/\*(.|\n)*?\*/'
+    t.lexer.lineno += t.value.count('\n')
+    pass  # Ignora comentário multilinha
+
 # Ignorar espaços, tabs e retorno de carro (Windows)
 t_ignore = ' \t\r'
 

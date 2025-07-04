@@ -28,16 +28,26 @@ class EstadoAtor:
 
 
 def interpretar_condicao(condicao, estado):
+    if not isinstance(condicao, (tuple, list)) or len(condicao) == 0:
+        estado.registrar(f"Condição inválida: {condicao}", tipo="erro")
+        return False
+
     tipo = condicao[0]
     if tipo == 'tocando_borda':
         cond = estado.posicao >= 100
         estado.registrar(f"Condição tocando_borda → {cond}", tipo="condicao")
         return cond
     elif tipo == 'pressionando_tecla':
+        if len(condicao) < 2:
+            estado.registrar("Condição pressionando_tecla inválida (falta tecla)", tipo="erro")
+            return False
         tecla = condicao[1]
         estado.registrar(f"Condição pressionando_tecla '{tecla}' → False (simulado)", tipo="condicao")
         return False
     elif tipo == 'tocando_cor':
+        if len(condicao) < 2:
+            estado.registrar("Condição tocando_cor inválida (falta cor)", tipo="erro")
+            return False
         cor = condicao[1]
         cond = estado.cor == cor
         estado.registrar(f"Condição tocando_cor '{cor}' → {cond}", tipo="condicao")
@@ -49,8 +59,12 @@ def interpretar_condicao(condicao, estado):
 
 def interpretar_comandos(lista, estado, nivel=0):
     for comando in lista:
-        estado.registrar(f"Executando comando '{comando.tipo}'", tipo="execucao", nivel_indent=nivel)
+        estado.registrar(f"Executando comando '{getattr(comando, 'tipo', str(comando))}'", tipo="execucao", nivel_indent=nivel)
         try:
+            if not hasattr(comando, 'tipo'):
+                estado.registrar(f"Comando inválido ignorado: {comando}", tipo="erro", nivel_indent=nivel)
+                continue
+
             if comando.tipo == 'mova':
                 estado.posicao += comando.valor
                 estado.registrar(f"Movendo {comando.valor} passos → posição agora: {estado.posicao}", tipo="movimento", nivel_indent=nivel)
@@ -74,6 +88,9 @@ def interpretar_comandos(lista, estado, nivel=0):
                 estado.registrar(f"Esperando {comando.valor} segundo(s)", tipo="tempo", nivel_indent=nivel)
 
             elif comando.tipo == 'se':
+                if not isinstance(comando.valor, (tuple, list)) or len(comando.valor) != 2:
+                    estado.registrar(f"Comando 'se' mal formado: {comando.valor}", tipo="erro", nivel_indent=nivel)
+                    continue
                 cond, blocos = comando.valor
                 estado.registrar(f"Avaliando condição 'se'", tipo="controle", nivel_indent=nivel)
                 if interpretar_condicao(cond, estado):
@@ -82,6 +99,9 @@ def interpretar_comandos(lista, estado, nivel=0):
                     estado.registrar(f"Condição falsa — bloco 'se' ignorado", tipo="controle", nivel_indent=nivel)
 
             elif comando.tipo == 'repita':
+                if not isinstance(comando.valor, (tuple, list)) or len(comando.valor) != 2:
+                    estado.registrar(f"Comando 'repita' mal formado: {comando.valor}", tipo="erro", nivel_indent=nivel)
+                    continue
                 vezes, blocos = comando.valor
                 estado.registrar(f"Iniciando repetição {vezes} vezes", tipo="controle", nivel_indent=nivel)
                 for i in range(vezes):
@@ -92,7 +112,7 @@ def interpretar_comandos(lista, estado, nivel=0):
                 estado.registrar(f"Comando desconhecido '{comando.tipo}' ignorado", tipo="erro", nivel_indent=nivel)
 
         except Exception as e:
-            estado.registrar(f"Erro ao executar comando '{comando.tipo}': {e}", tipo="erro", nivel_indent=nivel)
+            estado.registrar(f"Erro ao executar comando '{getattr(comando, 'tipo', 'desconhecido')}': {e}", tipo="erro", nivel_indent=nivel)
 
 def salvar_log_e_json(estado):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
